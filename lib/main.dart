@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:odoo/screens/HomeScreen.dart';
 import 'package:odoo/screens/Login_screen.dart';
 
 void main() {
@@ -13,7 +12,7 @@ class SuggestionHubApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MainScreen()
+      home: LoginScreen()
     );
   }
 }

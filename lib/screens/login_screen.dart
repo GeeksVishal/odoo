@@ -1,15 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:odoo/screens/HomeScreen.dart';
 import 'package:odoo/screens/forget_screen.dart';
-import 'package:odoo/screens/signup_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   LoginScreen({super.key});
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
+
   final TextEditingController _passwordController = TextEditingController();
 
-  void _Login() {
+   void _login(BuildContext context) async {
+    print("Login button clicked");
 
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill all fields")),
+      );
+      return;
+    }
+
+    try {
+      final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Success
+      print("Login success: ${userCredential.user?.email}");
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const StackItApp()), // or StackItApp()
+      );
+    } catch (e) {
+      print("Login error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Login failed: $e")),
+      );
+    }
   }
 
   @override
@@ -18,66 +55,54 @@ class LoginScreen extends StatelessWidget {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.lock_outline, size: 100, color: Colors.blue),
-              SizedBox(height: 40),
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  hint: Text('Enter Email'),
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email,color: Colors.blue,),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.lock_outline, size: 100, color: Colors.blue),
+                const SizedBox(height: 40),
+                TextField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.email),
+                  ),
                 ),
-              ),
-              SizedBox(height: 20),
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.lock,color: Colors.blue,),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Password',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.lock),
+                  ),
                 ),
-              ),
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => ForgetScreen()),
-                      );
-                    },
-                    child: Text("Forget Password ?"),
-                  ),
-                ],
-              ),
-              SizedBox(height: 30),
-              Container(
-                width: 150,
-                height: 40,
-                child: OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white, // Text color// Border color
-                    backgroundColor: Colors.blue, // Background color (optional)
-                  ),
-                  child: Text('Login'),
+                      ),
+                      child: const Text(
+                        "Forgot Password?",
+                        style: TextStyle(color: Colors.blue),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              SizedBox(height: 20,),
-              Text("don't have account ?"),
-              SizedBox(height: 10,),
-              InkWell(
-                  onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context) => SignupScreen()));},
-                  child: Text("Sign Up",style: TextStyle(color: Colors.blue),))
-            ],
+                const SizedBox(height: 30),
+                ElevatedButton(
+                  onPressed: () => _login(context),
+                  child: const Text('Login'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
