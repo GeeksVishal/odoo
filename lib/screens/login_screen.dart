@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:odoo/screens/forget_screen.dart';
+import 'package:odoo/screens/signup_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
@@ -70,6 +71,12 @@ class LoginScreen extends StatelessWidget {
                   child: Text('Login'),
                 ),
               ),
+              SizedBox(height: 20,),
+              Text("don't have account ?"),
+              SizedBox(height: 10,),
+              InkWell(
+                  onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context) => SignupScreen()));},
+                  child: Text("Sign Up",style: TextStyle(color: Colors.blue),))
             ],
           ),
         ),

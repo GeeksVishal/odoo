@@ -10,6 +10,9 @@ class SignupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+
+      ),
       body:
       Center(
         child: Padding(
@@ -28,8 +31,9 @@ class SignupScreen extends StatelessWidget {
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: 'Email',
+                  hint: Text("Enter Email"),
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
+                  prefixIcon: Icon(Icons.email,color: Colors.blue,),
                 ),
               ),
               SizedBox(height: 20),
@@ -39,23 +43,23 @@ class SignupScreen extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'Password',
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.lock),
+                  prefixIcon: Icon(Icons.lock,color: Colors.blue,),
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text("Forgot Password")
-                ],
-              ),
               SizedBox(height: 30),
-              ElevatedButton(
-                  child: Text('Login'),
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/login');
-                  }
-
+              Container(
+                width: 150,
+                height: 40,
+                child: OutlinedButton(
+                  onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white, // Text color// Border color
+                    backgroundColor: Colors.blue, // Background color (optional)
+                  ),
+                  child: Text('Sign Up'),
+                ),
               ),
+
             ],
           ),
         ),
