@@ -32,5 +32,5 @@ Welcome to **StackIt**, a community-driven Q&A app built with Flutter during the
 
 1. **Clone the repo**
    ```bash
-https://github.com/GeeksVishal/odoo.git
+    //github.com/GeeksVishal/odoo.git
    cd stackit
