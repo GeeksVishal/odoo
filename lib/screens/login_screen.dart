@@ -130,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 20,),
               TextButton(onPressed: () {
-                Navigator.pushReplacement(context,
+                Navigator.push(context,
                     MaterialPageRoute(builder: (context) => SignupScreen(),));
               }, child: Text('If New User Sign Up Here...'))
               ],
