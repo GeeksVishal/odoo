@@ -5,11 +5,10 @@ class LoginScreen extends StatelessWidget {
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-   
-   void _Login(){
-      print('tari mano pico');
-   }
-  
+
+  void _Login() {
+    print('tari mano pico');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +19,7 @@ class LoginScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.lock_outline,
-                size: 100,
-                color: Colors.blue,
-              ),
+              Icon(Icons.lock_outline, size: 100, color: Colors.blue),
               SizedBox(height: 40),
               TextField(
                 controller: _emailController,
@@ -32,7 +27,7 @@ class LoginScreen extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'Email',
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
+                  prefixIcon: Icon(Icons.email, color: Colors.blue),
                 ),
               ),
               SizedBox(height: 20),
@@ -42,20 +37,19 @@ class LoginScreen extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'Password',
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.lock),
+                  prefixIcon: Icon(Icons.lock, color: Colors.blue),
                 ),
               ),
+              SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text("Forgot Password")
-                ],
+                children: [Text("Forgot Password ?")],
               ),
               SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: () => _Login(),
-                child: Text('Login'),
-              ),
+          OutlinedButton(onPressed: () {},
+                    child: Text("Login",style: TextStyle(color: Colors.white),)),
+              SizedBox(height: 20),
+              Text("Already have Account ?"),
             ],
           ),
         ),
