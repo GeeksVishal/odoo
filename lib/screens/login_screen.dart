@@ -27,6 +27,7 @@ class LoginScreen extends StatelessWidget {
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: 'Email',
+                  hint: Text('Enter Email'),
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.email,color: Colors.blue,),
                 ),
