@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ForgetScreen extends StatelessWidget {
   final TextEditingController controller=TextEditingController();
 
-  const ForgetScreen({super.key});
+  ForgetScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
