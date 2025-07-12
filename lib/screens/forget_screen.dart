@@ -7,23 +7,25 @@ class ForgetScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextField(
-          controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'Enter Current Password',
-            border: OutlineInputBorder(),
+    return Scaffold(
+        body: Column(
+        children: [
+          TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              labelText: 'Enter Current Password',
+              border: OutlineInputBorder(),
+            ),
           ),
-        ),
-        const SizedBox(height: 16),
-        ElevatedButton(
-          onPressed: () {
-            
-          },
-          child: const Text('Reset'),
-        ),
-      ],
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              
+            },
+            child: const Text('Reset'),
+          ),
+        ],
+      ),
     );
   }
 }
