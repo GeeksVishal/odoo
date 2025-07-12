@@ -22,7 +22,7 @@ class ForgetScreen extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'Email',
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
+                  prefixIcon: Icon(Icons.email,color: Colors.blue,),
                 ),
               ),
               SizedBox(height: 15,),
