@@ -1,32 +1,94 @@
 import 'package:flutter/material.dart';
+import 'package:odoo/screens/NewPostScreen.dart';
 
-void main() => runApp(StackItApp());
+void main() {
+  runApp(const StackItApp());
+}
 
 class StackItApp extends StatelessWidget {
+  const StackItApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'StackIt',
-      home: StackItHomePage(),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.white,
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      ),
+      home: const MainScreen(),
+    );
+  }
+}
+/// ----------------------  MAIN SCREEN with Bottom Nav ----------------------
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _screens = [
+     StackItHomePage(),
+     ProfilePage(),
+  ];
+
+  void _onTabTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blue,
+        onTap: _onTabTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home, color: Colors.blue),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person, color: Colors.blue),
+            label: 'You',
+          ),
+        ],
+      ),
     );
   }
 }
 
-class StackItHomePage extends StatelessWidget {
-  final List<QuestionItem> questions = [
-    QuestionItem(
+/// ----------------------  HOME PAGE ----------------------
+class StackItHomePage extends StatefulWidget {
+   StackItHomePage({super.key});
+
+  @override
+  State<StackItHomePage> createState() => _StackItHomePageState();
+}
+
+class _StackItHomePageState extends State<StackItHomePage> {
+  final List<QuestionData> _questions = [
+    QuestionData(
       title: 'How to use Provider in Flutter?',
-      subtitle:
+      description:
       'I’m new to state management. How does Provider work and when should I use it?',
       tags: ['flutter', 'provider', 'state-management'],
       likes: 12,
       answers: 3,
       timeAgo: '2h ago',
     ),
-    QuestionItem(
+    QuestionData(
       title: 'Firebase vs Supabase for Flutter app?',
-      subtitle:
-      'Which backend is better for authentication and database?',
+      description: 'Which backend is better for authentication and database?',
       tags: ['flutter', 'firebase', 'supabase'],
       likes: 8,
       answers: 5,
@@ -34,45 +96,51 @@ class StackItHomePage extends StatelessWidget {
     ),
   ];
 
+  void _openAddDialog() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const NewPostScreen()),
+    );
+    String title = '';
+    String desc = '';
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF3F3DFF),
-        elevation: 0,
-        title: const Text(
-          'StackIt',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
+        title: const Text('StackIt'),
         centerTitle: true,
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
       ),
-      body: ListView.builder(
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openAddDialog,
+        child: const Icon(Icons.add),
+      ),
+      body: ListView.separated(
         padding: const EdgeInsets.all(16),
-        itemCount: questions.length,
-        itemBuilder: (context, index) {
-          return QuestionCard(question: questions[index]);
-        },
+        itemCount: _questions.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 16),
+        itemBuilder: (_, i) => QuestionCard(data: _questions[i]),
       ),
     );
   }
 }
 
-class QuestionItem {
+/// ----------------------  QUESTION DATA MODEL ----------------------
+class QuestionData {
   final String title;
-  final String subtitle;
+  final String description;
   final List<String> tags;
   final int likes;
   final int answers;
   final String timeAgo;
 
-  QuestionItem({
+  QuestionData({
     required this.title,
-    required this.subtitle,
+    required this.description,
     required this.tags,
     required this.likes,
     required this.answers,
@@ -80,65 +148,96 @@ class QuestionItem {
   });
 }
 
+/// ----------------------  QUESTION CARD ----------------------
 class QuestionCard extends StatelessWidget {
-  final QuestionItem question;
-
-  const QuestionCard({super.key, required this.question});
+  final QuestionData data;
+  const QuestionCard({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              question.title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              data.title,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
-              question.subtitle,
-              style: const TextStyle(fontSize: 14, color: Colors.black87),
+              data.description,
+              style: TextStyle(fontSize: 14, color: Colors.grey[800]),
             ),
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,
-              children: question.tags
-                  .map((tag) => Chip(
-                label: Text(tag),
-                backgroundColor: Colors.grey[200],
-                labelStyle: const TextStyle(fontSize: 13),
-              ))
+              children: data.tags
+                  .map(
+                    (tag) => Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    tag,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+              )
                   .toList(),
             ),
             const SizedBox(height: 12),
             Row(
               children: [
-                const Icon(Icons.thumb_up_alt_outlined, size: 18),
+                const Icon(Icons.thumb_up_alt_outlined, size: 16),
                 const SizedBox(width: 4),
-                Text('${question.likes}'),
+                Text('${data.likes}'),
                 const SizedBox(width: 16),
-                const Icon(Icons.chat_bubble_outline, size: 18),
+                const Icon(Icons.chat_bubble_outline, size: 16),
                 const SizedBox(width: 4),
-                Text('${question.answers} Answers'),
+                Text('${data.answers} Answers'),
                 const Spacer(),
                 Text(
-                  question.timeAgo,
-                  style: const TextStyle(color: Colors.grey),
+                  data.timeAgo,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
     );
   }
 }
+
+/// ----------------------  PROFILE PAGE ----------------------
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.deepPurple,
+        title: const Text(
+          'Your Profile',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+      ),
+      body: const Center(
+        child: Text(
+          'Welcome to your profile!',
+          style: TextStyle(fontSize: 18),
+        ),
+      ),
+    );
+  }
+}
+
