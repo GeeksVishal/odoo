@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:odoo/screens/NewPostScreen.dart';
+
+import 'Login_screen.dart';
 
 void main() {
   runApp(const StackItApp());
@@ -22,7 +25,8 @@ class StackItApp extends StatelessWidget {
     );
   }
 }
-/// ----------------------  MAIN SCREEN with Bottom Nav ----------------------
+
+/// ---------------------- MAIN SCREEN ----------------------
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -34,8 +38,8 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
-     StackItHomePage(),
-     ProfilePage(),
+    StackItHomePage(),
+    ProfilePage(),
   ];
 
   void _onTabTapped(int index) {
@@ -67,9 +71,9 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-/// ----------------------  HOME PAGE ----------------------
+/// ---------------------- HOME PAGE ----------------------
 class StackItHomePage extends StatefulWidget {
-   StackItHomePage({super.key});
+  const StackItHomePage({super.key});
 
   @override
   State<StackItHomePage> createState() => _StackItHomePageState();
@@ -79,8 +83,7 @@ class _StackItHomePageState extends State<StackItHomePage> {
   final List<QuestionData> _questions = [
     QuestionData(
       title: 'How to use Provider in Flutter?',
-      description:
-      'I’m new to state management. How does Provider work and when should I use it?',
+      description: 'I’m new to state management. How does Provider work and when should I use it?',
       tags: ['flutter', 'provider', 'state-management'],
       likes: 12,
       answers: 3,
@@ -101,9 +104,6 @@ class _StackItHomePageState extends State<StackItHomePage> {
       context,
       MaterialPageRoute(builder: (_) => const NewPostScreen()),
     );
-    String title = '';
-    String desc = '';
-
   }
 
   @override
@@ -129,7 +129,7 @@ class _StackItHomePageState extends State<StackItHomePage> {
   }
 }
 
-/// ----------------------  QUESTION DATA MODEL ----------------------
+/// ---------------------- QUESTION CARD DATA ----------------------
 class QuestionData {
   final String title;
   final String description;
@@ -148,7 +148,7 @@ class QuestionData {
   });
 }
 
-/// ----------------------  QUESTION CARD ----------------------
+/// ---------------------- QUESTION CARD UI ----------------------
 class QuestionCard extends StatelessWidget {
   final QuestionData data;
   const QuestionCard({super.key, required this.data});
@@ -163,34 +163,22 @@ class QuestionCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              data.title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            Text(data.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(
-              data.description,
-              style: TextStyle(fontSize: 14, color: Colors.grey[800]),
-            ),
+            Text(data.description, style: TextStyle(fontSize: 14, color: Colors.grey[800])),
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,
-              children: data.tags
-                  .map(
+              children: data.tags.map(
                     (tag) => Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.grey.shade200,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text(
-                    tag,
-                    style: const TextStyle(fontSize: 12),
-                  ),
+                  child: Text(tag, style: const TextStyle(fontSize: 12)),
                 ),
-              )
-                  .toList(),
+              ).toList(),
             ),
             const SizedBox(height: 12),
             Row(
@@ -203,10 +191,7 @@ class QuestionCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text('${data.answers} Answers'),
                 const Spacer(),
-                Text(
-                  data.timeAgo,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
+                Text(data.timeAgo, style: const TextStyle(fontSize: 12, color: Colors.grey)),
               ],
             ),
           ],
@@ -216,7 +201,7 @@ class QuestionCard extends StatelessWidget {
   }
 }
 
-/// ----------------------  PROFILE PAGE ----------------------
+/// ---------------------- PROFILE PAGE ----------------------
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
@@ -224,20 +209,87 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.deepPurple,
-        title: const Text(
-          'Your Profile',
-          style: TextStyle(color: Colors.white),
-        ),
+        backgroundColor: Colors.blue,
+        title: const Text('Your Profile', style: TextStyle(color: Colors.white)),
         centerTitle: true,
       ),
-      body: const Center(
-        child: Text(
-          'Welcome to your profile!',
-          style: TextStyle(fontSize: 18),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.blue[100],
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.person, size: 40, color: Colors.blue),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('user_name',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 4),
+                      Text('Join The Community',
+                          style: TextStyle(fontSize: 14, color: Colors.grey[700])),
+                    ],
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    await FirebaseAuth.instance.signOut();
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) =>  LoginScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  child:GestureDetector(
+                      child: Text('Sign Out'
+                      )
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(height: 32),
+            Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              elevation: 3,
+              child: ListTile(
+                leading: const Icon(Icons.feedback_outlined, color: Colors.blue),
+                title: const Text('How is Your experience with our app?'),
+                subtitle: const Text('We love to hear your suggestions.'),
+                trailing: TextButton(
+                  onPressed: () {},
+                  child: const Text('Give Feedback'),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              elevation: 3,
+              child: ListTile(
+                leading: const Icon(Icons.share_outlined, color: Colors.blue),
+                title: const Text('Grow together!'),
+                subtitle: const Text('Share our app and help others solve their problems.'),
+                trailing: TextButton(
+                  onPressed: () {},
+                  child: const Text('Share App'),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
-
