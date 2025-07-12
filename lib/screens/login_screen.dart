@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:lottie/lottie.dart';
 import 'package:odoo/screens/HomeScreen.dart';
 import 'package:odoo/screens/forget_screen.dart';
 import 'package:odoo/screens/signup_screen.dart';
@@ -15,7 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-   void _login(BuildContext context) async {
+  void _login(BuildContext context) async {
     print("Login button clicked");
 
     final email = _emailController.text.trim();
@@ -29,7 +30,8 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     try {
-      final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -39,7 +41,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const StackItApp()), // or StackItApp()
+        MaterialPageRoute(
+            builder: (_) => const StackItHomePage()), // or StackItApp()
       );
     } catch (e) {
       print("Login error: $e");
@@ -59,9 +62,22 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.lock_outline, size: 100, color: Colors.blue),
-                const SizedBox(height: 40),
-                TextField(
+              Lottie.asset('assets/animation_1.json',
+              width: 250,
+              height: 190,
+              repeat: true, // Loop animation
+              animate: true, // Play animation
+              ),
+              const SizedBox(height: 40),
+              Align(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text("Login", style: TextStyle(fontSize: 50),),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
@@ -70,8 +86,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     prefixIcon: Icon(Icons.email),
                   ),
                 ),
-                const SizedBox(height: 20),
-                TextField(
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
                   controller: _passwordController,
                   obscureText: true,
                   decoration: const InputDecoration(
@@ -80,15 +98,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     prefixIcon: Icon(Icons.lock),
                   ),
                 ),
-                const SizedBox(height: 10),
-                Row(
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ForgetScreen()),
-                      ),
+                      onTap: () =>
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) =>
+                                ForgetScreen()),
+                          ),
                       child: const Text(
                         "Forgot Password?",
                         style: TextStyle(color: Colors.blue),
@@ -96,19 +118,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 30),
-            OutlinedButton(
-              onPressed: () => _login(context),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.blue,
               ),
-              child: const Text('Login'),
-            ),
-                SizedBox(height: 20,),
-                TextButton(onPressed: () {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SignupScreen(),));
-                }, child: Text('If New User Sign Up Here...'))
+              const SizedBox(height: 30),
+              OutlinedButton(
+                onPressed: () => _login(context),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blue,
+                ),
+                child: const Text('Login'),
+              ),
+              SizedBox(height: 20,),
+              TextButton(onPressed: () {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => SignupScreen(),));
+              }, child: Text('If New User Sign Up Here...'))
               ],
             ),
           ),

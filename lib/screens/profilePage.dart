@@ -1,92 +1,90 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'Login_screen.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final User? user = FirebaseAuth.instance.currentUser;
+
     return Scaffold(
-      backgroundColor: Colors.white, // Light theme
       appBar: AppBar(
-        title: const Text(
-          'Plant Detector',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
         backgroundColor: Colors.blue,
-        centerTitle: false,
+        title: const Text('Your Profile', style: TextStyle(color: Colors.white)),
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             Row(
               children: [
-                const CircleAvatar(
-                  radius: 35,
-                  backgroundColor: Colors.blueAccent,
-                  child: Icon(Icons.person, size: 40, color: Colors.white),
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.blue[100],
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.person, size: 40, color: Colors.blue),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "user_name",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
+                      Text(
+                        user?.email ?? 'Anonymous User',
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                      const Text("Join The Community"),
-                      const SizedBox(height: 8),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text("Sign Up"),
-                      ),
+                      const SizedBox(height: 4),
+                      Text('Join The Community',
+                          style: TextStyle(fontSize: 14, color: Colors.grey[700])),
                     ],
                   ),
                 ),
+                ElevatedButton(
+                  onPressed: () async {
+                    await FirebaseAuth.instance.signOut();
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Sign Out'),
+                )
               ],
             ),
-            const SizedBox(height: 30),
-
-            // Feedback card
+            const SizedBox(height: 32),
             Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               elevation: 3,
-              color: Colors.blue.shade50,
               child: ListTile(
                 leading: const Icon(Icons.feedback_outlined, color: Colors.blue),
-                title: const Text("How is your experience with our app?"),
-                subtitle: const Text("We love to hear your suggestions."),
+                title: const Text('How is Your experience with our app?'),
+                subtitle: const Text('We love to hear your suggestions.'),
                 trailing: TextButton(
                   onPressed: () {},
-                  child: const Text("Give Feedback"),
+                  child: const Text('Give Feedback'),
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
-
-            // Share App card
             Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               elevation: 3,
-              color: Colors.blue.shade50,
               child: ListTile(
-                leading: const Icon(Icons.share, color: Colors.blue),
-                title: const Text("Grow together!"),
-                subtitle: const Text(
-                    "Share our app and help farmers solve their plant problems."),
+                leading: const Icon(Icons.share_outlined, color: Colors.blue),
+                title: const Text('Grow together!'),
+                subtitle: const Text('Share our app and help others solve their problems.'),
                 trailing: TextButton(
                   onPressed: () {},
-                  child: const Text("Share App"),
+                  child: const Text('Share App'),
                 ),
               ),
             ),

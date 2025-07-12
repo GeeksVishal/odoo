@@ -1,95 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'NewPostScreen.dart';
+import '../helper/db_helper.dart';
 import 'Login_screen.dart';
+import 'NewPostScreen.dart';
+import 'answer_page.dart';
 
-void main() {
-  runApp(const StackItApp());
-}
-
-class StackItApp extends StatelessWidget {
-  const StackItApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'StackIt',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white,
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MainScreen(),
-    );
-  }
-}
-
-// ---------------------- MAIN SCREEN ----------------------
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
-
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
-
-  final List<Widget> _screens = [
-    StackItHomePage(),
-    ProfilePage(),
-  ];
-
-  void _onTabTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        onTap: _onTabTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.blue),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person, color: Colors.blue),
-            label: 'You',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------- QUESTION DATA MODEL ----------------------
-class QuestionData {
-  final String title;
-  final String description;
-  final List<String> tags;
-  final int likes;
-  final int answers;
-  final String timeAgo;
-
-  QuestionData({
-    required this.title,
-    required this.description,
-    required this.tags,
-    required this.likes,
-    required this.answers,
-    required this.timeAgo,
-  });
-}
-
-// ---------------------- HOME PAGE ----------------------
 class StackItHomePage extends StatefulWidget {
   const StackItHomePage({super.key});
 
@@ -98,149 +13,160 @@ class StackItHomePage extends StatefulWidget {
 }
 
 class _StackItHomePageState extends State<StackItHomePage> {
-  final List<QuestionData> _questions = [
-    QuestionData(
-      title: 'How to use Provider in Flutter?',
-      description: 'I’m new to state management. How does Provider work and when should I use it?',
-      tags: ['flutter', 'provider', 'state-management'],
-      likes: 12,
-      answers: 3,
-      timeAgo: '2h ago',
-    ),
-    QuestionData(
-      title: 'Firebase vs Supabase for Flutter app?',
-      description: 'Which backend is better for authentication and database?',
-      tags: ['flutter', 'firebase', 'supabase'],
-      likes: 8,
-      answers: 5,
-      timeAgo: '5h ago',
-    ),
-  ];
+  Future<List<Map<String, dynamic>>>? _questionFuture;
+  int _selectedIndex = 0;
 
-  void _openAddDialog() async {
-    final result = await Navigator.push<QuestionData>(
+  @override
+  void initState() {
+    super.initState();
+    _refreshQuestions();
+  }
+
+  void _refreshQuestions() {
+    _questionFuture = DBHelper.getQuestions();
+    setState(() {});
+  }
+
+  Future<void> _openNewPost() async {
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const NewPostScreen()),
     );
-
-    if (result != null) {
-      setState(() {
-        _questions.insert(0, result);
-      });
-    }
+    if (result != null) _refreshQuestions();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('StackIt'),
-        centerTitle: true,
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        title: const Text("StackIt", style: TextStyle(color: Colors.blue)),
+        backgroundColor: Colors.transparent,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search, color: Colors.blue,),
+            onPressed: () {
+              showSearch(context: context, delegate: DataSearch());
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.sort, color: Colors.blue,),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Sort clicked")),
+              );
+            },
+          ),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'refresh') _refreshQuestions();
+            }, icon: Icon(Icons.more_vert, color: Colors.blue,),
+            itemBuilder: (context) =>
+            [
+              const PopupMenuItem(
+                value: 'refresh',
+                child: Text('Refresh'),
+              ),
+              const PopupMenuItem(
+                value: 'about',
+                child: Text('About'),
+              ),
+            ],
+          ),
+        ],
       ),
+      body: _selectedIndex == 0 ? buildHome() : buildProfile(),
       floatingActionButton: FloatingActionButton(
-        onPressed: _openAddDialog,
-        child: const Icon(Icons.add),
-      ),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemCount: _questions.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 16),
-        itemBuilder: (_, i) => QuestionCard(
-          data: _questions[i],
-          onDelete: () {
-            setState(() {
-              _questions.removeAt(i);
-            });
-          },
-        ),
-      ),
-    );
-  }
-}
-
-// ---------------------- QUESTION CARD UI ----------------------
-class QuestionCard extends StatelessWidget {
-  final QuestionData data;
-  final VoidCallback? onDelete;
-
-  const QuestionCard({super.key, required this.data, this.onDelete});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(data.title,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ),
-                if (onDelete != null)
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: onDelete,
-                  ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(data.description, style: TextStyle(fontSize: 14, color: Colors.grey[800])),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              children: data.tags
-                  .map((tag) => Container(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(tag, style: const TextStyle(fontSize: 12)),
-              ))
-                  .toList(),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                const Icon(Icons.thumb_up_alt_outlined, size: 16),
-                const SizedBox(width: 4),
-                Text('${data.likes}'),
-                const SizedBox(width: 16),
-                const Icon(Icons.chat_bubble_outline, size: 16),
-                const SizedBox(width: 4),
-                Text('${data.answers} Answers'),
-                const Spacer(),
-                Text(data.timeAgo,
-                    style: const TextStyle(fontSize: 12, color: Colors.grey)),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ---------------------- PROFILE PAGE ----------------------
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+        onPressed: _openNewPost,
         backgroundColor: Colors.blue,
-        title: const Text('Your Profile', style: TextStyle(color: Colors.white)),
-        centerTitle: true,
+        child: const Icon(Icons.add, color: Colors.white),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 6,
+        child: SizedBox(
+          height: 60,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              IconButton(
+                icon: Icon(Icons.home,
+                    color: _selectedIndex == 0 ? Colors.blue : Colors.grey),
+                onPressed: () => setState(() => _selectedIndex = 0),
+              ),
+              const SizedBox(width: 48),
+              IconButton(
+                icon: Icon(Icons.person,
+                    color: _selectedIndex == 1 ? Colors.blue : Colors.grey),
+                onPressed: () => setState(() => _selectedIndex = 1),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildHome() {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: _questionFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return const Center(child: Text('Error loading data'));
+        }
+
+        final data = snapshot.data ?? [];
+        if (data.isEmpty) {
+          return const Center(child: Text('No posts yet'));
+        }
+
+        return ListView.separated(
+          padding: const EdgeInsets.all(16),
+          itemCount: data.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 16),
+          itemBuilder: (_, i) {
+            final q = data[i];
+            return QuestionCard(
+              title: q['title'],
+              description: q['description'],
+              tags: ['flutter'],
+              // Optional: use actual tags if stored
+              likes: q['likes'],
+              answers: q['answers'],
+              timeAgo: q['timeAgo'],
+              questionId: q['id'],
+              onLike: () async {
+                await DBHelper.incrementLike(q['id']);
+                _refreshQuestions();
+              },
+              onDelete: () async {
+                await DBHelper.deleteQuestion(q['id']);
+                _refreshQuestions();
+              },
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        AnswerPage(
+                          questionId: q['id'],
+                          questionTitle: q['title'],
+                        ),
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget buildProfile() {
+    return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -262,10 +188,12 @@ class ProfilePage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text('user_name',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 4),
                       Text('Join The Community',
-                          style: TextStyle(fontSize: 14, color: Colors.grey[700])),
+                          style: TextStyle(
+                              fontSize: 14, color: Colors.grey[700])),
                     ],
                   ),
                 ),
@@ -286,10 +214,12 @@ class ProfilePage extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               elevation: 3,
               child: ListTile(
-                leading: const Icon(Icons.feedback_outlined, color: Colors.blue),
+                leading: const Icon(
+                    Icons.feedback_outlined, color: Colors.blue),
                 title: const Text('How is Your experience with our app?'),
                 subtitle: const Text('We love to hear your suggestions.'),
                 trailing: TextButton(
@@ -300,12 +230,14 @@ class ProfilePage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               elevation: 3,
               child: ListTile(
                 leading: const Icon(Icons.share_outlined, color: Colors.blue),
                 title: const Text('Grow together!'),
-                subtitle: const Text('Share our app and help others solve their problems.'),
+                subtitle: const Text(
+                    'Share our app and help others solve their problems.'),
                 trailing: TextButton(
                   onPressed: () {},
                   child: const Text('Share App'),
@@ -315,6 +247,147 @@ class ProfilePage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class QuestionCard extends StatelessWidget {
+  final String title;
+  final String description;
+  final List<String> tags;
+  final int likes;
+  final int answers;
+  final String timeAgo;
+  final int questionId;
+  final VoidCallback? onDelete;
+  final VoidCallback? onTap;
+  final VoidCallback? onLike;
+
+  const QuestionCard({
+    super.key,
+    required this.title,
+    required this.description,
+    required this.tags,
+    required this.likes,
+    required this.answers,
+    required this.timeAgo,
+    required this.questionId,
+    this.onDelete,
+    this.onTap,
+    this.onLike,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(title,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              if (onDelete != null)
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: onDelete,
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(description,
+              style: TextStyle(fontSize: 14, color: Colors.grey[800])),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            children: tags
+                .map((t) =>
+                Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(t, style: const TextStyle(fontSize: 12)),
+                ))
+                .toList(),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.thumb_up_alt_outlined, size: 16),
+                onPressed: onLike,
+              ),
+              const SizedBox(width: 4),
+              Text('$likes'),
+              const SizedBox(width: 16),
+              IconButton(
+                icon: const Icon(Icons.message, size: 16),
+                onPressed: onTap, // ✅ Only this opens AnswerPage
+              ),
+              const SizedBox(width: 4),
+              Text('$answers Answers'),
+              const Spacer(),
+              Text(timeAgo,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            ],
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+// 🔍 Search Delegate
+class DataSearch extends SearchDelegate<String> {
+  final recent = <String>[];
+  final allData = ["Firebase", "State", "UI", "Animations"];
+
+  @override
+  List<Widget> buildActions(BuildContext context) =>
+      [
+        IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: () => query = '',
+        ),
+      ];
+
+  @override
+  Widget buildLeading(BuildContext context) =>
+      IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () => close(context, ''),
+      );
+
+  @override
+  Widget buildResults(BuildContext context) =>
+      Center(child: Text("You searched: $query"));
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final suggestionList = query.isEmpty
+        ? recent
+        : allData
+        .where((p) => p.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+
+    return ListView.builder(
+      itemCount: suggestionList.length,
+      itemBuilder: (_, i) =>
+          ListTile(
+            title: Text(suggestionList[i]),
+            onTap: () {
+              query = suggestionList[i];
+              showResults(context);
+            },
+          ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:odoo/screens/Login_screen.dart';
 import 'HomeScreen.dart';
 
@@ -31,7 +32,7 @@ class SignupScreen extends StatelessWidget {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const StackItApp()),
+        MaterialPageRoute(builder: (_) =>  StackItHomePage()),
       );
     } on FirebaseAuthException catch (e) {
       String message;
@@ -64,7 +65,6 @@ class SignupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Sign Up")),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -72,26 +72,43 @@ class SignupScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.lock_outline, size: 100, color: Colors.blue),
+                Lottie.asset('assets/animation_3.json',
+                  width: 350,
+                  height: 190,
+                  repeat: true, // Loop animation
+                  animate: true, // Play animation
+                ),
                 const SizedBox(height: 40),
-                TextField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    hintText: "Enter Email",
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email, color: Colors.blue),
+                Align(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text("Sign Up", style: TextStyle(fontSize: 50),),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      hintText: "Enter Email",
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.email, color: Colors.blue),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.lock, color: Colors.blue),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Password',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.lock, color: Colors.blue),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 30),
