@@ -7,7 +7,7 @@ class LoginScreen extends StatelessWidget {
   final TextEditingController _passwordController = TextEditingController();
    
    void _Login(){
-
+      print('tari mano pico');
    }
   
 
