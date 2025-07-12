@@ -7,7 +7,7 @@ class LoginScreen extends StatelessWidget {
   final TextEditingController _passwordController = TextEditingController();
    
    void _Login(){
-      print('tari mano pico');
+
    }
   
 
@@ -45,35 +45,21 @@ class LoginScreen extends StatelessWidget {
                   prefixIcon: Icon(Icons.lock),
                 ),
               ),
-              SizedBox(height: 10,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  InkWell(onTap: (){
-
-        }
-                    child: Text("Forgot Password ?"))
-    ],
-    ),
-    SizedBox(height: 30),
-    Container(
-    width: 150,
-    height: 40,
-    child: OutlinedButton(
-    onPressed: () {},
-    style: OutlinedButton.styleFrom(
-    foregroundColor: Colors.white, // Text color// Border color
-    backgroundColor: Colors.blue, // Background color (optional)
-    ),
-    child: Text('Login'),
-    ),
-    )
-
-    ],
-    ),
-    ),
-    ),
+                  Text("Forgot Password")
+                ],
+              ),
+              SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: () => _Login(),
+                child: Text('Login'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
-    }
   }
 }
