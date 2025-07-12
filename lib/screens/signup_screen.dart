@@ -59,7 +59,11 @@ class SignupScreen extends StatelessWidget {
                   child: Text('Sign Up'),
                 ),
               ),
-
+SizedBox(height: 15,),
+Text("Already Have Account ?"),
+              SizedBox(height: 13,),
+              InkWell(onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));},
+                child: Text("Login",style: TextStyle(color: Colors.blue),))
             ],
           ),
         ),
