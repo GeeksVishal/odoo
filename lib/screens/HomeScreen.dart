@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:odoo/screens/NewPostScreen.dart';
-
+import 'NewPostScreen.dart';
 import 'Login_screen.dart';
 
 void main() {
@@ -26,7 +25,7 @@ class StackItApp extends StatelessWidget {
   }
 }
 
-/// ---------------------- MAIN SCREEN ----------------------
+// ---------------------- MAIN SCREEN ----------------------
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -71,7 +70,26 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-/// ---------------------- HOME PAGE ----------------------
+// ---------------------- QUESTION DATA MODEL ----------------------
+class QuestionData {
+  final String title;
+  final String description;
+  final List<String> tags;
+  final int likes;
+  final int answers;
+  final String timeAgo;
+
+  QuestionData({
+    required this.title,
+    required this.description,
+    required this.tags,
+    required this.likes,
+    required this.answers,
+    required this.timeAgo,
+  });
+}
+
+// ---------------------- HOME PAGE ----------------------
 class StackItHomePage extends StatefulWidget {
   const StackItHomePage({super.key});
 
@@ -99,11 +117,17 @@ class _StackItHomePageState extends State<StackItHomePage> {
     ),
   ];
 
-  void _openAddDialog() {
-    Navigator.push(
+  void _openAddDialog() async {
+    final result = await Navigator.push<QuestionData>(
       context,
       MaterialPageRoute(builder: (_) => const NewPostScreen()),
     );
+
+    if (result != null) {
+      setState(() {
+        _questions.insert(0, result);
+      });
+    }
   }
 
   @override
@@ -123,35 +147,25 @@ class _StackItHomePageState extends State<StackItHomePage> {
         padding: const EdgeInsets.all(16),
         itemCount: _questions.length,
         separatorBuilder: (_, __) => const SizedBox(height: 16),
-        itemBuilder: (_, i) => QuestionCard(data: _questions[i]),
+        itemBuilder: (_, i) => QuestionCard(
+          data: _questions[i],
+          onDelete: () {
+            setState(() {
+              _questions.removeAt(i);
+            });
+          },
+        ),
       ),
     );
   }
 }
 
-/// ---------------------- QUESTION CARD DATA ----------------------
-class QuestionData {
-  final String title;
-  final String description;
-  final List<String> tags;
-  final int likes;
-  final int answers;
-  final String timeAgo;
-
-  QuestionData({
-    required this.title,
-    required this.description,
-    required this.tags,
-    required this.likes,
-    required this.answers,
-    required this.timeAgo,
-  });
-}
-
-/// ---------------------- QUESTION CARD UI ----------------------
+// ---------------------- QUESTION CARD UI ----------------------
 class QuestionCard extends StatelessWidget {
   final QuestionData data;
-  const QuestionCard({super.key, required this.data});
+  final VoidCallback? onDelete;
+
+  const QuestionCard({super.key, required this.data, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -163,22 +177,35 @@ class QuestionCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(data.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(data.title,
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ),
+                if (onDelete != null)
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: onDelete,
+                  ),
+              ],
+            ),
             const SizedBox(height: 8),
             Text(data.description, style: TextStyle(fontSize: 14, color: Colors.grey[800])),
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,
-              children: data.tags.map(
-                    (tag) => Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(tag, style: const TextStyle(fontSize: 12)),
+              children: data.tags
+                  .map((tag) => Container(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(20),
                 ),
-              ).toList(),
+                child: Text(tag, style: const TextStyle(fontSize: 12)),
+              ))
+                  .toList(),
             ),
             const SizedBox(height: 12),
             Row(
@@ -191,7 +218,8 @@ class QuestionCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text('${data.answers} Answers'),
                 const Spacer(),
-                Text(data.timeAgo, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                Text(data.timeAgo,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey)),
               ],
             ),
           ],
@@ -201,7 +229,7 @@ class QuestionCard extends StatelessWidget {
   }
 }
 
-/// ---------------------- PROFILE PAGE ----------------------
+// ---------------------- PROFILE PAGE ----------------------
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
@@ -245,17 +273,14 @@ class ProfilePage extends StatelessWidget {
                   onPressed: () async {
                     await FirebaseAuth.instance.signOut();
                     Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) =>  LoginScreen()),
+                      MaterialPageRoute(builder: (context) => LoginScreen()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
                   ),
-                  child:GestureDetector(
-                      child: Text('Sign Out'
-                      )
-                  ),
+                  child: const Text('Sign Out'),
                 )
               ],
             ),

@@ -1,5 +1,6 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'HomeScreen.dart';
+// for QuestionData
 
 class NewPostScreen extends StatefulWidget {
   const NewPostScreen({super.key});
@@ -9,92 +10,50 @@ class NewPostScreen extends StatefulWidget {
 }
 
 class _NewPostScreenState extends State<NewPostScreen> {
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descController = TextEditingController();
-  File? _image;
-
+  final _titleController = TextEditingController();
+  final _descController = TextEditingController();
 
   void _sendPost() {
-    if (_titleController.text.trim().isEmpty ||
-        _descController.text.trim().isEmpty) {
-      return;
-    }
+    final title = _titleController.text.trim();
+    final desc = _descController.text.trim();
 
-    // TODO: Save the post data (optional)
+    if (title.isEmpty || desc.isEmpty) return;
 
-    Navigator.pop(context); // close screen
+    final newPost = QuestionData(
+      title: title,
+      description: desc,
+      tags: ['flutter'], // default tags
+      likes: 0,
+      answers: 0,
+      timeAgo: 'Just now',
+    );
+
+    Navigator.pop(context, newPost);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("New Post"),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
+      appBar: AppBar(title: const Text("New Post"), backgroundColor: Colors.blue),
       body: Padding(
-        padding:  EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text("Your post title",
-                  style: Theme.of(context).textTheme.labelLarge),
-            ),
-            const SizedBox(height: 8),
             TextField(
               controller: _titleController,
-              decoration: InputDecoration(
-                hintText: "Add a title of post",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+              decoration: const InputDecoration(labelText: 'Post Title'),
             ),
-            const SizedBox(height: 20),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text("Description Of A Post",
-                  style: Theme.of(context).textTheme.labelLarge),
-            ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
             TextField(
               controller: _descController,
               maxLines: 4,
-              decoration: InputDecoration(
-                hintText: "Describe More About Post",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+              decoration: const InputDecoration(labelText: 'Post Description'),
             ),
-            const SizedBox(height: 20),
-
-            if (_image != null) ...[
-              const SizedBox(height: 16),
-              Image.file(_image!, height: 150),
-            ],
-
             const Spacer(),
-
-            // Send Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _sendPost,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding:  EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                child:  Text(
-                  "send",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
+            ElevatedButton(
+              onPressed: _sendPost,
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+              child: const Text('Send', style: TextStyle(color: Colors.white)),
             )
           ],
         ),
