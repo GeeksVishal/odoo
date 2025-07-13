@@ -4,6 +4,10 @@ Welcome to **StackIt**, a community-driven Q&A app built with Flutter during the
 
 ---
 
+Devendra Jethava -TL 
+jethavadevendra24@gmail.com
+
+
 ## 📱 Features
 
 - 🧠 Ask and answer questions
