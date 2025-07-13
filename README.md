@@ -16,7 +16,6 @@ jethavadevendra24@gmail.com
 - 📦 Local storage using `sqflite`
 - 🔐 Firebase Authentication (Login, Register, Forgot Password)
 - 📤 Lottie animations and smooth UI
-- 📁 Image Picker for watch app (optional feature)
 - 📄 Profile page with sign-out, share, and feedback options
 
 ---
